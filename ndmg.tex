@@ -86,11 +86,10 @@ The requisite data includes numerous datasets with multiple measurements per ind
 The requisite pipeline must be able to fully process each sample and study, and analyze the results both within and across studies using a coherent statistical model.
 These will be explored in the particular application of structural connectomics.
 
-The Consortium of Reliability and Reproducibility (CoRR) dataset alongside others summarized in \ref{tab:data} were used. 
+The Consortium of Reliability and Reproducibility (CoRR) dataset alongside others summarized in Table~\ref{tab:data} were used. 
 However, no existing pipeline could successfully estimate and meaningfully process every scan in this dataset while also quantifying the magnitude and source of variability amongst them.
-We, therefore, established several principles and metrics to guide the development of pipelines.
-% @jovo: what are the principles? You mention that we create them in the sentence above, and reference them "above" in the sentence below
-We developed an approach, ``Neuro Data MRI to Graphs'' (\ndmg), that meets or exceeds standards along each of the above mentioned principles.
+We, therefore, established several principles and metrics to guide the development of pipelines, as will be discussed in Section~\ref{sec:results}.
+We developed an pipeline, ``Neuro Data MRI to Graphs'' (\ndmg), that meets or exceeds standards along each of these principles.
 We validated our pipeline by running \ndmg~on 11 dMRI studies comprising 3,227 individuals with 4,347 scans.
 For each scan \ndmg~estimates  a ``connectome'' (a structural map of connectivity) at 24 different spatial resolutions---yielding a total of  $>100,000$ estimated connectomes---all of which are publicly available from \url{http://m2g.io}.
 This is the largest open database of connectomes~\cite{brown2016connected}, and one of the largest mega-analyses (inference across studies) of multi-modal connectomics data to date~\cite{varoquaux2013learning, vidaurre2017discovering}. 
@@ -121,21 +120,25 @@ For imaging, more comprehensively phenotyped individuals and more coordinated da
 %                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
+\label{sec:results}
 %\subsection{Overview}
 
-Table~\ref{tab:pipelines} depicts \ndmg's performance with regard to each of the below described principles for reproducible pipelines.  
-For each principle, we outline a procedure for evaluating the degree to which a pipeline adheres to that principle, enabling the principle-based evaluation of disparate approaches. 
-%Each pipeline  receives a \greencheck~if it fully adheres to the principle, an \ocheck~if it partially adheres, and a \redx~if it does not adhere.
+Table~\ref{tab:pipelines} depicts \ndmg's performance with regard to each of the below described principles for reproducible pipelines.
+For each principle, we outline a procedure for evaluating the degree to which a pipeline adheres to that principle, enabling the principle-based evaluation of disparate approaches.
 
 \subparagraph*{Statistical Principles}
-The statistical principles are designed to evaluate the empirical quality of the method on real data. Better quality suggests the pipeline can be trusted to be reliable for subsequent investigations. 
+The statistical principles are designed to evaluate the empirical quality of the method on real data.
+Better quality suggests the pipeline can be trusted to be reliable for subsequent investigations.
 
 % \noindent 
-\emph{Accuracy} quantifies the distance between ``the truth' and an estimate---also known as ``validity''---and is closely related to the statistical concepts of ``unbiased'' and ``consistent''.  
-Because the truth is unknown for these data, no pipeline can be meaningfully evaluated in terms of accuracy. Until the field develops the technological capability to obtain ``ground truth'' data, we rely on surrogate information. 
+\emph{Accuracy} quantifies the distance between the ``truth'' and an estimate---also known as ``validity''---and is closely related to the statistical concepts of ``unbiased'' and ``consistent''.
+Because the truth is unknown for these data, no pipeline can be ideally evaluated in terms of accuracy.
+Until the field develops the technological capability to obtain ``ground truth'' data, we rely on surrogate information. 
 Specifically, %\ndmg~incorporates extensive QA ,
 %For example, users can visualize fibers to confirm that they all stay within the skull.  
-\ndmg~incorporates the quality assessment (QA )from CPAC~\cite{cpac} as well as other pipelines, and also adds several novel QA figures, with at least one figure per processing stage, yielding a total of 11 QA figures per diffusion scan and 32 per functional scan (see \ref{app:pipes} for details). \ndmg~does not filter any data based on QA thresholds, as the choice of threshold remains both subjective and task dependent.
+\ndmg~incorporates common quality assessment (QA) figures and adds several novel QA figures, with at least one figure per processing stage.
+This yields a total of 11 QA figures per diffusion scan (see \ref{app:pipes} for details).
+\ndmg~does not filter any data based on QA thresholds, as the choice of threshold remains both subjective and task dependent.
 
 % \noindent 
 \emph{Reliability} colloquially refers to methods that produce a similar result given a similar input, also called ``stability'' in the statistics literature~\cite{Yu2013}.
