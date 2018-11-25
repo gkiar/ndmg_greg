@@ -130,62 +130,58 @@ For each principle, we outline a procedure for evaluating the degree to which a 
 The statistical principles are designed to evaluate the empirical quality of the method on real data.
 Better quality suggests the pipeline can be trusted to be reliable for subsequent investigations.
 
-% \noindent 
 \emph{Accuracy} quantifies the distance between the ``truth'' and an estimate---also known as ``validity''---and is closely related to the statistical concepts of ``unbiased'' and ``consistent''.
 Because the truth is unknown for these data, no pipeline can be ideally evaluated in terms of accuracy.
 Until the field develops the technological capability to obtain ``ground truth'' data, we rely on surrogate information. 
-Specifically, %\ndmg~incorporates extensive QA ,
-%For example, users can visualize fibers to confirm that they all stay within the skull.  
-\ndmg~incorporates common quality assessment (QA) figures and adds several novel QA figures, with at least one figure per processing stage.
+Specifically, \ndmg~incorporates common quality assessment (QA) figures and adds several novel QA figures, with at least one figure per processing stage.
 This yields a total of 11 QA figures per diffusion scan (see \ref{app:pipes} for details).
 \ndmg~does not filter any data based on QA thresholds, as the choice of threshold remains both subjective and task dependent.
 
-% \noindent 
 \emph{Reliability} colloquially refers to methods that produce a similar result given a similar input, also called ``stability'' in the statistics literature~\cite{Yu2013}.
-To evaluate a method's reliability, Wang et al.~\cite{discriminability} developed a metric  called ``discriminability'' that quantifies the fraction of measurements from the same individual that are closer to one another than they are to the measurement of any other individual (details below). 
+To evaluate a method's reliability, Wang et al.~\cite{discriminability} developed a metric  called ``discriminability'' that quantifies the fraction of measurements from the same individual that are closer to one another than they are to the measurement of any other individual (details below).
+This is similar to intrai-class correlation (ICC)~\cite{yen2002examining}, a statistic commonly used to evaluate test-retest datasets, but provides an output of higher resolution.
 
 \ndmg's discriminability over all scans was nearly $0.98$ for dMRI data and over $0.88$ for fMRI. 
-% Pipelines for which there are no published examples of reliability receive a \ocheck, on the assumption that they might also be reliable. 
 
-% \noindent 
-\emph{Robustness} quantifies accuracy and reliability across a wide range of studies with different properties, including different experimental design, measurement devices, etc.  
-We, therefore, ran \ndmg~on 11 dMRI studies and 18 fMRI studies using different hardware and acquisition parameters (see Table~\ref{tab:data} for details). In some of these studies samples were not  filtered to discard outliers or samples with poor signal-to-noise properties. Nonetheless, for each study, \ndmg's QA suggested accuracy, and each study achieved a score of discriminability $>0.8$. 
+\emph{Robustness} quantifies accuracy and reliability across a wide range of studies with different properties, including different experimental design, measurement devices, etc.
+We, therefore, ran \ndmg~on 11 dMRI studies using different hardware and acquisition parameters (see Table~\ref{tab:data} for details).
+In some of these studies samples were not filtered to discard outliers or samples with poor signal-to-noise properties.
+Nonetheless, for each study, \ndmg's QA suggested accuracy, and each study achieved a score of discriminability $>0.8$.
 
 \subparagraph*{Computational Principles}
-Adhering to the computational principles lowers the barrier for use. In practice, this means that both domain experts and researchers from other disciplines (such as machine learning and statistics), can more easily use the tools.  
-% scalability, portability, turn-key, and open
+Adhering to the computational principles lowers the barrier for use.
+In practice, this means that both domain experts and researchers from other disciplines (such as machine learning and statistics), can use the tools with minimal assistance.
 
-% \noindent 
-\emph{Expediency} refers to the time it takes to run an approach on a typical sample.  
-In practice, we suspect that users are more likely to adopt pipelines that run in about an hour per scan as compared to those that run overnight per scan, for example.
-The \ndmg~runtime is about $20$ minutes for a functional scan, and $1.5$ hours for a diffusion scan. 
-%Pipelines that require about a day are not expedient.
+\emph{Expediency} refers to the time it takes to run an approach on a typical sample.
+With the growing popularity of both cloud computing and the use of shared data centres for performing neuroimaging analyses, the expediency of a pipeline is particulary important as this is directly responsible for the cost of the analysis.
+The \ndmg~runtime is $1.5$ hours for a diffusion scan at $1 mm$ resolution. 
 
-\emph{Parallelized} refers to the ability of the method to parallelize the code across multiple computers.  \ndmg~enables parallelization across scans---using the commercial cloud or a high-performance cluster, for example, enables \ndmg~to run many thousands of scans in only $1.5$ hours.
+\emph{Parallelized} refers to the ability of the method to parallelize the code across multiple computers.
+\ndmg~enables parallelization across scans---using the commercial cloud or a high-performance cluster, for example, enables \ndmg~to run many thousands of scans in only $1.5$ hours.
 
-% \noindent 
-\emph{Portability}---meaning the ability to be run on different platforms, from laptop and cloud, with minimal installation and configuration energy---enables different analysts using different hardware resources to seamlessly use the code. We have tested \ndmg~on multiple hardware and operating system setups, including Windows, OSX, and Linux laptops,  multi-core workstations, singularity clusters, and the Amazon cloud.  Moreover, we have deployed \ndmg~on both openneuro~\cite{openneuro} and CBRAIN~\cite{CBRAIN}, making it possible for anybody to  run \ndmg~for free on their own or other's computational resources.  
+\emph{Portability}---meaning the ability to be run on different platforms, from laptop and cloud, with minimal installation and configuration energy---enables different analysts using different hardware resources to seamlessly use the code.
+We have tested \ndmg~on multiple hardware and operating system setups, including Windows, OSX, and Linux laptops,  multi-core workstations, Singularity clusters, and the Amazon cloud.
+Moreover, we have deployed \ndmg~on both Openneuro~\cite{openneuro} and CBRAIN~\cite{CBRAIN}, making it possible for anybody to  run \ndmg~for free on their own or other's computational resources.  
 
-% \noindent 
-\emph{Turn-Key} methods do not require the user to specify parameters and settings for each stage of processing or for each new study. This feature reduces the time for researchers to get a pipeline running, and enables pooling data across multiple pipelines because the analysis is harmonized (conducted identically across studies). 
-%possibility of over-fitting when choosing the algorithmic details associated with each processing stage. 
-\ndmg~parameters have been tuned to yield accurate and reliable connectome estimates across nearly 30 different studies.  
-Moreover, \ndmg~is fully compliant with Brain Imaging Data Structure (BIDS)---a recently proposed specification for organizing multi-scan, multi-individual, and multi-modality studies~\cite{bids, bidsapps}.  
+\emph{Turn-Key} methods do not require the user to specify parameters and settings for each stage of processing or for each new study.
+This feature reduces the time for researchers to get a pipeline running, and enables pooling data across multiple pipelines because the analysis is harmonized (conducted identically across studies). 
+Additionally, this reduces the possibility of over-fitting when choosing the algorithmic details associated with each processing stage.
+\ndmg~parameters have been tuned to yield accurate and reliable connectome estimates across 11 different studies.
+Moreover, \ndmg~is fully compliant with Brain Imaging Data Structure (BIDS)---a recently proposed specification for organizing multi-scan, multi-individual, and multi-modality studies~\cite{bids, bidsapps}.
 
-% \noindent 
-\emph{Open}, referring to both open source code and open access data derivatives processed using the code, enables anybody with Web-access to contribute to the scientific process. 
- \ndmg~leverages open source packages with permissive licenses, and is released under the Apache 2.0 open source license.  
+\emph{Open}, referring to both open source code and open access data derivatives processed using the code, enables anybody with Web-access to contribute to the scientific process.
+\ndmg~leverages open source packages with permissive licenses, and is released under the Apache 2.0 open source license.
 Our website, \url{http://m2g.io} contains links to download all of the data derivatives and quality assurance figures from each scan, and is the largest open database of connectomes and other data derivatives to our knowledge.
 % @reb: change url to m2g.neurodata.io when that is live.
-By developing \ndmg~according to these  statistical and computational design principles, and running it on many diverse studies, we can evaluate individuals, studies, and the collection of studies at an unprecedented scale. Below, we describe the nuts and bolts of the pipeline, followed by a set of \ndmg~-enabled scientific findings. Our hope is that \ndmg~and the data products derived from it will be useful for a wide variety of discoveries.
+By developing \ndmg~according to these statistical and computational design principles, and running it on many diverse studies, we can evaluate individuals, studies, and the collection of studies at an unprecedented scale.
+Below, we describe the nuts and bolts of the pipeline, followed by a set of \ndmg~-enabled scientific findings.
+Our hope is that \ndmg~and the data products derived from it will be useful for a wide variety of discoveries.
 
-\subparagraph*{Connectome Principles} We also consider a pair of principles that are specific for reproducible pipelines in connectomics.  
+\subparagraph*{Connectome Principles} We also consider a pair of principles that are specific for reproducible pipelines in connectomics.
 
+\emph{Raw-to-Graph} refers to the pipeline performing all steps of analysis required to acquire connectomes (graphs) given raw, unprocessed M3R scans with no user input.
+The \ndmg~pipeline was built to take raw dMRI and T1w images and produce a diffusion connectome.
 
-
-\emph{dMRI and fMRI} pipelines operate on diffusion  or functional MRI data respectively.
-
-\emph{Raw-to-Graph} refers to the pipeline performing all steps of analysis required to acquire connectomes (graphs) given raw, unprocessed M3R scans with no user input. The \ndmgd~pipeline was built to take raw dMRI and T1w images and produce a diffusion connectome, and the \ndmgf~pipeline takes raw fMRI and T1w images and produces a functional connectome.
 
 \subsection{Individual-Level Analysis}
 
@@ -197,102 +193,40 @@ By developing \ndmg~according to these  statistical and computational design pri
 %\input{figure_ohbm_discr.tex}
 %%%%%%%
 
-In the individual-level analysis, each individual  undergoes some number of sessions, during which multiple different modalities can be collected.
-The input to \ndmg~for a given individual is  the collection of scans and some metadata for each scan, including a structural scan, % (T1w/MPRAGE), 
-and either, or both of, (1) a diffusion scan, including the diffusion parameters files,  and (2) a functional scan, including the slice acquisition sequence.
-The individual-level of \ndmg~ analysis leverages existing open source tools, including
-the fMRI Software Library (FSL) ~\cite{fsl1, fsl2, fsl3}, Dipy~\cite{dipy}, the MNI152 atlas~\cite{mni152}, and a variety of parcellations defined in the MNI152 space~\cite{desikan, aal, jhu, harvardoxford, talairach, slab907, slab1068, pvt, glasser} (see \ref{app:parcels} for details about built-in parcellations included). 
-% @reb: vince says: [hey, we have a number of ICA parcellation schemes, the way we like to use them is to run spatially constrained ICA on new data using these as priors...if you want to do something with this let me know, possible collaboration going forward? ;-) ] let's get them in our set?
+The input to \ndmg~for a given individual is the collection of scans and some metadata for each scan, including a structural scan and a diffusion scan including the diffusion parameters files.
+The individual-level of \ndmg~analysis leverages existing tools, including the fMRI Software Library (FSL) ~\cite{fsl1, fsl2, fsl3}, Dipy~\cite{dipy}, the MNI152 atlas~\cite{mni152}, and a variety of parcellations defined in the MNI152 space~\cite{desikan, aal, jhu, harvardoxford, talairach, slab907, slab1068, pvt, glasser} (see \ref{app:parcels} for details about built-in parcellations included).
 All algorithms requiring hyper-parameter selection were initially set to the suggested parameters for each tool, and tuned to improve the accuracy, reliability, expediency, and robustness of the results.
-The output of each processing stage includes data derivatives and QA figures to enable individualized accuracy assessments.
-The QA figures at many stages include cross-sectional images at different depths in the three canonical planes (sagittal, coronal, and axial) of images or overlays. Example QA figures are provided in \ref{app:dpipe} and \ref{app:fpipe}.
-%---which we refer to as QAX---as specified below.
-%A crucial component of the design of \ndmg~was to include  quality assurance (QA) figures for each stage to the pipeline, to enable users to easily detect whether or not the pipeline is producing accurate results. 
-%Snapshots of these QA figures are shown Figure~\ref{fig:ndmgpipeline}.%, whereas exemplars are provided in \ref{app:pipeline}.
+The output of each processing stage includes data derivatives and QA figures to enable individualized assessments.
+The QA figures at many stages include cross-sectional images at different depths in the three canonical planes (sagittal, coronal, and axial) of images or overlays.
+Example QA figures are provided in \ref{app:dpipe}.
 
-\paragraph{Individual-Level Diffusion Analysis}
-
-The \ndmgd~pipeline consists of four key components: (1) registration, (2) tensor estimation, (3) tractography, and (4) graph generation (see Figure~\ref{fig:ndmgpipeline} for an illustration, and 
-\ref{app:dpipe} for further details). It was optimized on the Kirby21 dataset, and then applied to the remaning 10 datasets.
+The \ndmg~pipeline consists of four key components: (1) registration, (2) tensor estimation, (3) tractography, and (4) graph generation (see Figure~\ref{fig:ndmgpipeline} for an illustration, and 
+\ref{app:dpipe} for further details).
+It was optimized on the Kirby21 dataset, and then applied to the remaning 10 datasets.
 Below, we provide a brief description of each step.
 
 \begin{description}[style=unboxed,leftmargin=0cm]
-        \item[Registration] uses FSL's ``standard'' linear registration pipeline % \textit{eddy\_correct}, \textit{epi\_reg}, \textit{flirt}, and \textit{apply\_xfm} 
-        to register the structural and diffusion images to the MNI152 atlas~\cite{fsl1,fsl2,fsl3,mni152}. Nonlinear registration, though possibly more accurate~\cite{klein,lddmm}, was not sufficiently robust to include (it often failed on some studies without manual intervention).
+    \item[Registration] uses FSL's ``standard'' linear diffusion registration pipeline to register the structural and diffusion images to the MNI152 atlas~\cite{fsl1,fsl2,fsl3,mni152}.
+    Nonlinear registration, though possibly more accurate~\cite{klein,lddmm}, was not sufficiently robust to include (it often failed on some studies without manual intervention).
     
-        %QAX overlays of the dMRI image and the MNI152 atlas.
+    \item[Tensor Estimation] uses DiPy~\cite{dipy} to obtain an estimated tensor in each voxel.
 
-        \item[Tensor Estimation] uses DiPy~\cite{dipy}
-%       's gradient-table, TensorModel, fit, get-sphere, and quantize-evecs
-        to obtain an estimated tensor in each voxel. %QAX depicts a fractional anisotropy map.
-        \item[Tractography] uses DiPy's \textit{EuDX}~\cite{eudx}, a deterministic tractography algorithm closely related to \textit{FACT}~\cite{fact}, to obtain a streamline from each voxel. %QAX visualizes of a subset of the streamlines within the MNI152 brain.
-        Probabilistic tractography, while possibly more accurate, requires orders of magnitude more computational time.  Visual QA of the generated fibers suggested that deterministic was sufficiently accurate for our purposes. 
-        \item[Graph Generation] Graphs are formed by contracting fiber streamlines \ref{app:graphgen} into sub-regions depending on spatial ~\cite{glocal} proximity or neuro-anatomical ~\cite{aal, desikan, harvardoxford, talairach, jhu, glasser, pvt, slab907, slab1068} similarity. QA are performed as in the functional pipeline,  described below.
-%       Connectomes are created by tracing fibers through pre-defined parcellations.
-%As fibers are traced, an undirected edge is added to the graph for every pair of regions along the path, where the weight of the edge is the cumulative number of fibers between two regions. 
+    \item[Tractography] uses DiPy's \textit{EuDX}~\cite{eudx}, a deterministic tractography algorithm closely related to \textit{FACT}~\cite{fact}, to obtain a streamline from each voxel.
+    Probabilistic tractography, while possibly more accurate, requires orders of magnitude more computational time, and therefore, cost.
+    Visual QA of the generated fibers suggested that deterministic was sufficiently accurate to be used for parcellation-based analysis as is the case here.
+
+    \item[Graph Generation] Graphs are formed by contracting fiber streamlines into regions dictated by pre-defined parcellations.
+    QA for the connectomes occurs during the group-level analysis discussed below.
 \end{description}
 
+Individual-level analysis in \ndmg~takes approximately $1.5$ hours to complete using 1~CPU core and 12~GB of RAM at 1 mm$^3$ resolution.
+The individual-level analysis was run on 11 studies, including 3,227 individuals and 4,347 scans.
+Each dataset generated connectomes across each of the parcellations in \ref{app:parcels}, resulting in 104,328 structural brain-graphs.
 
 
-%\subparagraph{Registration}
-%
-%\ndmgd~leverages FSL~\cite{fsl1,fsl2,fsl3} for a series of linear registrations. Taking as input the minimally preprocessed dMRI and T1W images, the end result is the dMRI volumes aligned to the MNI152 atlas~\cite{mni152}. 
-%The registration pipeline implemented is ``standard'' when working with diffusion data and FSL's tools.
-%The QA figure produced at this stage is cross-sectional images at different depths in the three canonical planes (sagittal, coronal, and axial) of an overlay of the dMRI image and the MNI152 atlas.
-%
-%\paragraph{Tensor Estimation}
-%A voxelwise tensor image from the dMRI image stack using a simple 6-component tensor model from  Dipy~\cite{dipy}.
-%The aligned diffusion volumes and b-values/b-vectors files are transformed into a 6-dimensional tensor volume, a single dimension \ndmg~pipeline enables three tiers of analysis: individual-level, group-level, and meganalysis (see 
-%Figure for each component of the resulting tensors.
-%A fractional anisotropy map of the tensors is provided for QA, again using multiple depths in each of the three canonical image planes.
-%
-%\paragraph{Tractography}
-%Streamlines are generated from the tensors using Dipy's EuDX~\cite{eudx}, a deterministic tractography algorithm closely related to FACT~\cite{fact}.
-%Each voxel within the tensor image, confined to the boundary of the brain mask, is used as a seed-point in EuDX and fibers are produced and then pruned based on their length.
-%\ndmgd~provides a QA plot visualizing a subset of the generated streamlines within a mask of the MNI152 brain so that the user can verify that their structure resembles that of the fractional anisotropy map generated in the previous step.
-%
-%\paragraph{Graph Generation}
+\paragraph{Multi-Scale Analysis}
 
-
-%Below we provide a brief description of each step, \ref{app:pipeline} provides further details.
-%While each of these steps is described here, an in-depth look at the specific models and algorithms implemented at each stage contained within \ref{app:pipeline}.
-Individual-level analysis in \ndmgd~takes approximately $1.5$ hours to complete using 1~CPU core and 12~GB of RAM at 1 mm$^3$ resolution.
-The individual-level analysis was run on 11 studies, including 3,227 individuals and 4,347 scans. Each dataset generated connectomes across each of the parcellations in \ref{app:parcels}, resulting in 104,328 functional brain-graphs.
-
-
-\paragraph{Individual-Level Functional Analysis}
-
-The \ndmgf~pipeline can be broken up into four key components: (1) preprocessing, (2) registration, (3) nuisance correction, and (4) graph generation (see Figure~\ref{fig:ndmgpipeline}for an illustration and  \ref{app:fpipe} for further details).
-The \ndmgf~pipeline was constructed starting with the optimal processing pipeline identified in Wang et. al~\cite{discriminability} using CPAC~\cite{cpac}. Hyperparameters and further algorithm selection was optimized for reliability based on multiple measurement studies (including test-retest).
-Below, we provide a brief description of each step.
-%, and \ref{app:fpipe} provides further details.
-%While each of these steps is described here, an in-depth look at the specific models and algorithms implemented at each stage contained within \ref{app:pipeline}.
-
-\begin{description}[style=unboxed,leftmargin=0cm]
-        \item[Preprocessing] uses AFNI~\cite{AFNI}  for brain extraction, and FSL~\cite{Jenkinson2002,Woolrich2009} for slice-timing and motion correction. 
-        \item[Registration] uses FSL~\cite{fsl1, Greve2009,Andersson2007}  to perform a non-linear boundary based registration of the fMRI into the MNI152 space~\cite{mni152}. 
-The registration pipeline implemented is ``standard'' when working with functional data and FSL's tools~\cite{cpac}.
-%QAX includes various overlays and signal-to-noise images.
-%between the fMRI image and the T1w image, and the T1w image with the segmented white-matter used mask for boundary-based registration. 
-%During template-alignment, QAX overlays  fMRI image and the MNI152 atlas \cite{mni152} and the T1w image and the MNI152 atlas \cite{mni152}. Additionally, QAX includes voxel-wise signal-to-noise, contrast-to-noise, and mean-intensity images.
-\item[Nuisance Correction] uses custom Python code to implement a general linear model incorporating regressors for quadratic detrending \cite{Tanabe, Smith1999}, top five white-matter and cerebrospinal fluid Principal Components (CompCor) \cite{Behzadi2007,Ciric2017174}, and the Friston 24-parameter regressors \cite{Friston1996}. Low-frequency drift is then removed below $0.01$ Hz \cite{Lindquist2009}, and the first 15 seconds of the fMRI sequence are discarded \cite{Bright2016}. 
-% @reb: vince says: typically there is a low pass filter applied as well, cutoff somewhere between 0.08 and 0.15.  
-% @reb: let's check low-pass fileter post submission.  please add to github? or asana? i think maybe github for pipeline changes?  post in the appropriate place and delete comment here.
-\item[Graph Generation] uses custom Python code to compute the average timeseries for all voxels within an ROI, then computes correlations between all pairs of ROIs. 
-% @reb: vince says try ICA here, let's add ICA atlas post submission.  
-%The resulting $4-d$ functional volume is masked by the MNI152 template \cite{mni152}, and the included voxels are output as the voxel timeseries. Region-of-Interest (ROI) timeseries are created by averaging the intensities of all voxels segmented into a region at each timestep. Regions are delineated by pre-defined parcellations using the same collection as \ndmgd. Correlation matrices are then created by taking the pairwise correlation between each pair of ROI timeseries. 
-The functional connectome is then rank-transformed by replacing the magnitude of the correlation with its relative rank, from smallest to largest~\cite{discriminability}.  
-%QA for each parcellation pipeline includes the registered functional volume overlaid with the parcellation, the registered t1w image overlaid with the parcellation, the the ROI timeseries per-ROI, and the estimated functional connectome as an adjacency matrix, and  the same graph statistics as for the diffusion connectomes. 
-\end{description}
-
-
-Individual-level analysis in \ndmgf~takes approximately 20~minutes to complete using 1~CPU core and 3~GB of RAM at 2 mm$^3$resolution.
-The individual-level analysis was run on 714 individuals with 1,646 scans from 18 studies, generating connectomes across each of the 24 parcellations in \ndmgd, and resulting in 39,504 total brain-graphs.
-
-\paragraph{Multi-Scale Multi-Connectome Analysis}
-
-For both diffusion and functional MRI, \ndmg~downsamples the voxel-wise graphs to obtain weighted graphs for many different parcellation schemes. This includes: (1) neuroanatomically delineated parcellations, such as the HarvardOxford cortical and sub-cortical atlases~\cite{harvardoxford}, the JHU~\cite{jhu}, Talairach~\cite{talairach}, Desikan~\cite{desikan}, and AAL~\cite{aal} atlases; (2) algorithmically delineated parcellations, such as Slab907~\cite{slab907}, Slab1068~\cite{slab1068}, and CC200~\cite{cpac};  and (3) 16 down-sampled parcellations ranging from 70 to 72,783 nodes~\cite{glocal}.  
-For each, the \emph{multi-connectome} is defined by the set of nodes from a particular parcellation, and the set of (potentially weighted and/or directed) edges from each modality.
+The atlases used in \ndmg include (1) neuroanatomically delineated parcellations, such as the HarvardOxford cortical and sub-cortical atlases~\cite{harvardoxford}, the JHU~\cite{jhu}, Talairach~\cite{talairach}, Desikan~\cite{desikan}, and AAL~\cite{aal} atlases; (2) algorithmically delineated parcellations, such as Slab907~\cite{slab907}, Slab1068~\cite{slab1068}, and CC200~\cite{cpac};  and (3) (3) spatially down-sampled parcellations ranging from 70 to 72,783 nodes~\cite{glocal}.
 
 The QA for graph generation includes a heat map of the adjacency matrix, the number of non-zero edges, and several multivariate graph statistics (one statistic per vertex in the graph) including:  betweenness centrality, clustering coefficient, hemisphere-separated degree sequence, edge weight, eigenvalues of the graph laplacian, and locality statistic-1~\cite{glocal}.
 We developed the hemisphere-separated degree sequence to indicate the ipsilateral and contralateral degree for each vertex, which we found quite useful for QA.  
