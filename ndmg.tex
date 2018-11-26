@@ -223,16 +223,8 @@ Individual-level analysis in \ndmg~takes approximately $1.5$ hours to complete u
 The individual-level analysis was run on 11 studies, including 3,227 individuals and 4,347 scans.
 Each dataset generated connectomes across each of the parcellations in \ref{app:parcels}, resulting in 104,328 structural brain-graphs.
 
-
-\paragraph{Multi-Scale Analysis}
-
 The atlases used in \ndmg include (1) neuroanatomically delineated parcellations, such as the HarvardOxford cortical and sub-cortical atlases~\cite{harvardoxford}, the JHU~\cite{jhu}, Talairach~\cite{talairach}, Desikan~\cite{desikan}, and AAL~\cite{aal} atlases; (2) algorithmically delineated parcellations, such as Slab907~\cite{slab907}, Slab1068~\cite{slab1068}, and CC200~\cite{cpac};  and (3) (3) spatially down-sampled parcellations ranging from 70 to 72,783 nodes~\cite{glocal}.
 
-The QA for graph generation includes a heat map of the adjacency matrix, the number of non-zero edges, and several multivariate graph statistics (one statistic per vertex in the graph) including:  betweenness centrality, clustering coefficient, hemisphere-separated degree sequence, edge weight, eigenvalues of the graph laplacian, and locality statistic-1~\cite{glocal}.
-We developed the hemisphere-separated degree sequence to indicate the ipsilateral and contralateral degree for each vertex, which we found quite useful for QA.  
-\ref{app:graphgenf} includes definitions and implementation details for each of the statistics.
-Supplementary Figure ~\ref{fig:multiscale} shows, for a single individual, the graph summary statistics for the multi-connectome (including both functional and diffusion) across the set of atlases described above.
-% @reb: post submission, consider overlaying the D & F plots 
 
 %%%%%%%
 \input{table_discr.tex}
@@ -240,33 +232,26 @@ Supplementary Figure ~\ref{fig:multiscale} shows, for a single individual, the g
 
 \subsection{Group-Level Analysis}
 
-We ran \ndmg~on the 11 diffusion and 18 functional studies listed in 
-Table~\ref{tab:data}.
-For each, \ndmg~group-level analysis computes and plots group-level graph summary and reliability statistics. 
+\ndmg~group-level analysis operates on a dataset level, and both computes and plots graph summary and reliability statistics.
+These include a heat map of the mean adjacency matrix, the number of non-zero edges per graph, and several multivariate graph statistics (one statistic per vertex in the graph) including:  betweenness centrality, clustering coefficient, hemisphere-separated degree sequence, edge weight, eigenvalues of the graph laplacian, and locality statistic-1~\cite{glocal}.
+We developed the hemisphere-separated degree sequence to indicate the ipsilateral and contralateral degree for each vertex, which we found quite useful for QA.
+\ref{app:graphgenf} includes definitions and implementation details for each of the statistics.
+Supplementary Figure ~\ref{fig:multiscale} shows, for a single individual, the graph summary statistics across the set of atlases described above.
+
 
 %%%%%%%
 \input{figure_graphqa.tex}
 %%%%%%%
 
-\paragraph{Group Level Implementation Strategy}
+\paragraph{Parallelization of \ndmg}
 
-Leveraging previous efforts developed in our  ``Science in the Cloud''~\cite{sic} manuscript, multiple scans and studies are evaluated in parallel for participant-level analysis, and the derivatives are pooled for group-level analysis, much like typical map-reduce approaches (consistent with the BIDS app specification~\cite{bidsapps}). The parallel  implementation uses the Amazon Web Services (AWS) cloud, in particular leveraging their storage (S3) and high performance computing (Batch) services. Data are stored in an S3 bucket enabling  the \ndmg~cloud-API connectome estimation pipeline to process all scans on Amazon Batch in parallel. In practice,  AWS limits the number of parallel threads users are allowed to launch (to prevent accidental spending). After connectome estimation is complete, the same cloud-API exposed by \ndmg~enables group-level analysis to be launched and parallelized across each parcellation for all scans within each study.
-% 
-% > our
-% or "the"
-% 
-% ^.
-We were able to compute diffusion connectomes at 24~scales for each of the publicly available 2,861~scans (totaling 68,664~connectomes) in under one day and \$1,000. Had we processed each scan in parallel, cost would have remained the same but only taken $1.5$~hours.
-
-\paragraph{Group-Level Graph Summary Statistics}
-
-Each scan's estimated connectome can be summarized by a set of graph statistics, as described above. For group-level analysis, we visualize each scan's summary statistics overlaid on one another. For example, Figure~\ref{fig:graphqa} demonstrates that each diffusion graph from the BNU3 dataset using the Desikan atlas has relatively similar values for the statistics (we use the Desikan atlas for the remainder of the analyses unless otherwise specified). Moreover, it is clear from both the degree plot and the mean connectome plot that the dMRI connectomes from this study tend to have more connections within a hemisphere than across a hemisphere, as expected. For the fMRI connectomes, however, the homotopic connections---that is, connections from one region on a hemisphere to the same region on the other hemisphere---seem particularly strong.
-%Supplementary Figure ~\ref{fig:graphqaf} shows example group-level analysis for the same study's functional data.
- 
-%\ref{app:multi} illustrates how \ndmg~also computes the average value for each univariate and multivariate statistic for each atlas, and demonstrates similarities across scales, indicating that that the basic structure of the connectomes is preserved across different atlases.
-
-
-%\subsubsection{\ndmgf~Individual-Level Pipeline}
+Leveraging previous efforts developed in our  ``Science in the Cloud''~\cite{sic} manuscript, multiple scans and studies are evaluated in parallel for participant-level analysis, and the derivatives are pooled for group-level analysis, much like typical map-reduce approaches (consistent with the BIDS app specification~\cite{bidsapps}).
+The parallel  implementation uses the Amazon Web Services (AWS) cloud, in particular leveraging their storage (S3) and high performance computing (Batch) services.
+Data are stored in an S3 bucket enabling  the \ndmg~cloud-API connectome estimation pipeline to process all scans on Amazon Batch in parallel.
+In practice,  AWS limits the number of parallel threads users are allowed to launch (to prevent accidental spending).
+After connectome estimation is complete, the same cloud-API exposed by \ndmg~enables group-level analysis to be launched and parallelized across each parcellation for all scans within each study.
+Using this method, diffusion connectomes were generated at 24~scales for each of the publicly available 2,861~scans (totaling 68,664~connectomes) in under one day and \$1,000 USD.
+Had we processed each scan in parallel, cost would have remained the same but only taken $1.5$~hours.
 
 \paragraph{Group-Level Discriminability}
 \label{sec:disc}
@@ -278,32 +263,22 @@ D = Pr(|| a_{ij} - a_{ij'} || \leq || a_{ij} - a_{i'j'} ||).
 \label{eq:disc}
 \end{equation}
 In the context of reliability in \ndmg, each connectome, $a_{ij}$, is compared to other connectomes belonging to the same individual, $a_{ij'}$, and to all connectomes belonging to other individuals, $a_{i'j'}$.
-A perfect discriminability score indicates that for all observations within the group, each connectome is more like connectomes from the same individual than others.
-Table~\ref{tab:data} lists the discriminability score of each study with repeated measurements (five dMRI studies and sixteen fMRI).
- \ndmgd~achieves a discriminability score of nearly 0.99 or greater on most studies (the lowest score was nearly 0.9).  \ndmgf~achieves a discriminability score around 0.9 on all studies. 
-These high discriminability scores  were achieved by optimizing both \ndmgd~and \ndmgf~on a subset of the data.  Specifically, \ndmgd~was optimized using only the Kirby21 study, to achieve a perfect discriminability score.  Nonetheless, the other studies achieved comparably high discriminability scores, despite the fact that the Kirby21 used a Philips scanner, unlike any of the other studies. Moreover, Kirby21's age distribution is substantially different from several of the other dMRI studies (see Table~\ref{tab:data}).  
-Similarly, \ndmgf~was optimized using only 13 of the 18 studies, and yet discriminability on the remaining studies remained equally high~\cite{discriminability}, even though they also exhibited large study demographic and acquisition protocol variability.
-Finally, \ndmg~was not optimized explicitly at all on multimodal data, nonetheless, for all datasets with multiple scans per subject with both dMRI and fMRI, using the multimodal connectomes improved (or did not decrease) discriminability relative to either modality on its own.
+A perfect discriminability score, $1$, indicates that for all observations within the group, each connectome is more like connectomes from the same individual than others.
+Table~\ref{tab:data} lists the discriminability score of each study with repeated measurements.
+\ndmg~achieves a discriminability score of nearly 0.99 or greater on most studies (the lowest score was nearly 0.9).
+This high discriminability score was achieved by optimizing \ndmg~on a subset of the data.
+Specifically, \ndmg~was optimized using only the Kirby21 study to achieve a perfect discriminability score. 
+Nonetheless, the other studies achieved comparably high discriminability scores, despite the fact that the Kirby21 used a Philips scanner, unlike any of the other studies.
+Moreover, Kirby21's age distribution is substantially different from several of the other dMRI studies (see Table~\ref{tab:data}).
 That \ndmg's discriminability score is robust to data acquisition details and study demographics across modalities suggests that scientific results may also be robust to such sources of variability.
 
-% Note that we invested significant effort in both pipelines to achieve these high discriminability scores, and to our knowledge, no other pipelines have been assessed with regards to discriminability. 
- 
- % or any other reliability metric.
-%
-%The discriminability score obtained if a pipeline produced random outputs is summarized in Equation~\ref{eq:chance}, and is a function of the number of classes, $k$, the number of elements in each class, $M_i$, and the total number of observations, $N$:
-%
-%\begin{equation}
-%C = \frac{\sum_{i \in k}^{k}M_{i}^{2}}{N^{2}}.
-%\label{eq:chance}
-%\end{equation}
-%
-%Optimizing \ndmg~with respect to discriminability enables us to minimize the upper-bound on error for any general downstream inference task.
-%Using discriminability for optimization also prevents over-fitting to covariate-specific signal (i.e. in contrast to optimizing the pipeline for sex classification).
 
 \subsection{Mega-Level Analysis}
 
-Many sources of variability contribute to the observed summary statistics, including individual- or population-level variation,  and different types of measurement or analysis techniques. By virtue of harmonizing the analysis across individuals and studies, we are able assess the remaining degrees of variability due to measurement and demographic-specific effects. Although population-level effects are expected when comparing two different populations with different demographics, variability across measurements must be relatively small for inferences based on neuroimaging to be valid across these populations. Therefore, we conducted mega-analysis to address these remaining sources of variation.  
-
+Many sources of variability contribute to the observed summary statistics, including individual- or population-level variation, and different types of measurement or analysis techniques.
+By virtue of harmonizing the analysis across individuals and studies, we are able assess the remaining degrees of variability due to measurement and demographic-specific effects.
+Although population-level effects are expected when comparing two different populations with different demographics, variability across measurements must be relatively small for inferences based on neuroimaging to be valid across these populations.
+Therefore, we conducted mega-analysis to address these remaining sources of variation.
 
 \paragraph{Consistency Within and Across Studies}
 
